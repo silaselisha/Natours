@@ -11,8 +11,9 @@ const dataBase = process.env.DATABASE_URI.replace('<password>', process.env.DATA
 
 mongoose.connect(dataBase, {
     useNewUrlParser: true,
-    useFindAndModify: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+    useCreateIndex: true
 }).then(() => {
     console.log('Successfully connected to database')
 }).catch(err => {
