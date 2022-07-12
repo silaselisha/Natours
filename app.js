@@ -4,6 +4,8 @@ const cors = require('cors')
 
 const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
+const AppError = require('./utils/appError')
+const globalErrorHandler = require('./controllers/error/errorHandler')
 
 const app = express()
 
@@ -17,5 +19,11 @@ if(process.env.NODE_ENV === 'development') {
 
 app.use('/api/v1/tours', tourRouter)
 app.use('/api/v1/users', userRouter)
+
+app.all('*', (req, res, next) => {
+    return next(new AppError('Routes not implemented in the server', 404))
+})
+
+app.use(globalErrorHandler)
 
 module.exports = app

@@ -1,102 +1,90 @@
 const colors = require('colors')
 const Tour = require('../models/tourMode')
 const APIFeatures = require('../utils/apiFeatures')
+const catchAsync = require('../utils/catchAsync')
+const AppError = require('../utils/appError')
 
-exports.getTours = async (req, res) => {
-    try {
-        const features = new APIFeatures(Tour.find(), req.query)
-                                .filter()
-                                .fieldsSelect()
-                                .sorting()
-                                .pagination()
+exports.getTours = catchAsync(async (req, res, next) => {
 
-        const tours = await features.query
+    const features = new APIFeatures(Tour.find(), req.query)
+                            .filter()
+                            .fieldsSelect()
+                            .sorting()
+                            .pagination()
 
-        res.status(200).json({
-            status: 'success',
-            results: tours.length,
-            data: {
-                tours
-            }
-        })    
-    } catch (err) {
-        res.status(404).json({
-            status: 'fail',
-            message: err
-        })
+    const tours = await features.query
+
+    res.status(200).json({
+        status: 'success',
+        results: tours.length,
+        data: {
+            tours
+        }
+    })    
+})
+
+exports.getTour = catchAsync(async (req, res, next) => {
+
+    const tour = await Tour.findById(req.params.id)
+
+    if(!tour) {
+        return next(new AppError('Tour with that id was not found', 404))
     }
-}
 
-exports.getTour = async (req, res) => {
-    try {
-        const tour = await Tour.findById(req.params.id)
+    res.status(200).json({
+        status: 'success',
+        data: {
+            tour
+        }
+    })   
+})
 
-        res.status(200).json({
-            status: 'success',
-            data: {
-                tour
-            }
-        })   
-    } catch (err) {
-        res.status(404).json({
-            status: 'fail',
-            message: err
-        })
+exports.createTour = catchAsync(async (req, res, next) => {
+
+    const tourData = req.body
+    const tour = await Tour.create(tourData)
+
+    if (!tour) {
+        return next(new AppError('Tour was not created', 400));
     }
-}
 
-exports.createTour = async (req, res) => {
-    try {
-        const tourData = req.body
-        const tour = await Tour.create(tourData)
+    res.status(201).json({
+        status: 'success',
+        data: {
+            tour
+        }
+    })  
+})
 
-        res.status(201).json({
-            status: 'success',
-            data: {
-                tour
-            }
-        })  
-    } catch (err) {
-        res.status(400).json({
-            status: 'fail',
-            message: err
-        })
+exports.updateTour = catchAsync(async (req, res, next) => {
+   
+    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true
+    })
+
+    if (!tour) {
+        return next(new AppError('Tour with that id was not found', 404));
     }
-}
 
-exports.updateTour = async (req, res) => {
-    try {
-        const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true
-        })
+    res.status(200).json({
+        status: 'success',
+        data: {
+            tour
+        }
+    })   
+})
 
-        res.status(200).json({
-            status: 'success',
-            data: {
-                tour
-            }
-        })   
-    } catch (err) {
-        res.status(404).json({
-            status: 'fail',
-            message: err
-        })
+exports.deleteTour = catchAsync(async (req, res, next) => {
+ 
+    const tour = await Tour.findByIdAndDelete(req.params.id)
+
+    if (!tour) {
+        return next(new AppError('Tour with that id was not found', 404));
     }
-}
 
-exports.deleteTour = async (req, res) => {
-    try {
-        await Tour.findByIdAndDelete(req.params.id)
-
-        res.status(204).json({
-            status: 'success',
-            data: null
-        })   
-    } catch (err) {
-        res.status(404).json({
-            status: 'fail',
-            message: err
-        })
-    }
-}
+    res.status(204).json({
+        status: 'success',
+        data: null
+    })   
+})
