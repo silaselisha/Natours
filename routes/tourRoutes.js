@@ -1,16 +1,21 @@
 const express = require('express')
 
 const { getTours, getTour, createTour, updateTour, deleteTour } = require('../controllers/tourController')
-const { protect } = require('../controllers/auth/authController')
+const { protect, restrictTo } = require('../controllers/auth/authController')
 const router = express.Router()
 
 router.route('/')
     .get(getTours)
-    .post(protect, createTour)
+    .post(protect, restrictTo('admin', 'lead-guide'), createTour)
 
-router.route('/:id')
-    .get(protect, getTour)
-    .put(protect, updateTour)
-    .delete(protect, deleteTour)
+router
+  .route('/:id')
+  .get(
+    protect,
+    restrictTo('user', 'admin', 'lead-guide', 'tour-guide'),
+    getTour
+  )
+  .put(protect, restrictTo('admin', 'lead-guide'), updateTour)
+  .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour);
 
 module.exports = router
