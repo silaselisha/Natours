@@ -1,5 +1,5 @@
 const colors = require('colors')
-const Tour = require('../models/tourMode')
+const Tour = require('../models/tourModel')
 const APIFeatures = require('../utils/apiFeatures')
 const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/appError')
