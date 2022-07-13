@@ -1,3 +1,4 @@
+const { promisify } = require('util')
 const jwt = require('jsonwebtoken')
 
 const AppError = require('../../utils/appError')
@@ -48,4 +49,43 @@ exports.logIn = catchAsync(async (req, res, next) => {
         token
     })
 })
- 
+
+exports.protect = catchAsync(async (req, res, next) => {
+  
+    let token
+    if(!req.headers.authorization) {
+        return next(new AppError('Unauthorized to access this resource, please signup or login', 401))
+    }
+
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1]
+    }
+
+    if(!token) {
+        return next(
+        new AppError(
+            'Unauthorized to access this resource, please signup or login',
+            401
+        )
+        );
+    }
+
+    const decodedToken = await jwt.verify(token, process.env.JWT_PRIVATE_KEY)
+    
+    const user = await User.findById(decodedToken.id).select('+password')
+
+    if (!user) {
+      return next(
+        new AppError(`User with ${decodedToken.id} was not found`, 404)
+      );
+    }
+
+    if (user.checkChangedPasswords(decodedToken.iat)) {
+      return next(
+        new AppError(`Users' password was recently changed`, 400)
+      );
+    }
+
+    req.user = user
+    next()
+})

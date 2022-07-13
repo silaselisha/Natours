@@ -22,6 +22,10 @@ const handleValidationError = (err) => {
   return new AppError(message, 400)
 }
 
+const handleJsonWebTokenError = (err) => {
+  return new AppError('Invalid token', 500)
+}
+
 const sendErrorToDeveloper = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -63,6 +67,9 @@ const globalErrorHandler = (err, req, res, next) => {
 
         if (err.name === 'ValidationError') 
           err = handleValidationError(err)
+
+        if (err.name === 'JsonWebTokenError') 
+          err = handleJsonWebTokenError(err)
 
         sendErrorToClient(err, res);
     }

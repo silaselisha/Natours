@@ -1,16 +1,16 @@
 const express = require('express')
 
 const { getTours, getTour, createTour, updateTour, deleteTour } = require('../controllers/tourController')
-
+const { protect } = require('../controllers/auth/authController')
 const router = express.Router()
 
 router.route('/')
     .get(getTours)
-    .post(createTour)
+    .post(protect, createTour)
 
 router.route('/:id')
-    .get(getTour)
-    .put(updateTour)
-    .delete(deleteTour)
+    .get(protect, getTour)
+    .put(protect, updateTour)
+    .delete(protect, deleteTour)
 
 module.exports = router
