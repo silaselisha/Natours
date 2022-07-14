@@ -1,4 +1,5 @@
 const { promisify } = require('util')
+const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 
 const AppError = require('../../utils/appError')
@@ -94,7 +95,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 exports.restrictTo = (...roles) => {
     return catchAsync(async (req, res, next) => {
         if(!roles.includes(req.user.role)){
-            return next(new AppError(`The user is not authorized to access this resource.`, 401))
+            return next(new AppError(`The user is not authorized to access this resource.`, 403))
         }
         next()
     })
@@ -135,10 +136,39 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
         await user.save({
             saveBeforeValidate: false
         })
+
+        return next(new AppError('An error occurred while sending the email!', 500))
     }
 
     res.status(200).json({
         status: 'success',
         message: 'email successfully sent...'
     })
+})
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+   const { password, confirmPassword } = req.body
+
+   const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex')
+   const user = await User.findOne({passwordResetToken: hashedToken, passwordResetTokenExpires: {$gt: Date.now()}})
+   
+   if(!user) {
+    return next(new AppError(`User was not found or invalid token`, 400))
+   }
+
+   user.password = password
+   user.confirmPassword = confirmPassword
+   user.passwordResetTokenExpires = undefined
+   user.passwordResetToken = undefined
+
+   user.save()
+
+   const token = jwt.sign({id: user._id}, process.env.JWT_PRIVATE_KEY, {
+    expiresIn: process.env.JWT_EXPIRES_IN
+   })
+
+   res.status(200).json({
+    status: 'success',
+    token
+   })
 })
