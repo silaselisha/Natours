@@ -7,6 +7,20 @@ const catchAsync = require('../../utils/catchAsync')
 const sendEmail = require('../../utils/sendEmail')
 const User = require('../../models/userModel')
 
+const sendJwtTokenResponse = (user, statusCode, res) => {
+    const token = jwt.sign({id: user._id}, process.env.JWT_PRIVATE_KEY, {
+        expiresIn: process.env.JWT_EXPIRES_IN
+    })
+
+    res.status(statusCode).json({
+        status: 'success',
+        token,
+        data: {
+            user
+        }
+    })
+}
+
 
 exports.signUp = catchAsync(async (req, res, next) => {
     const user = await User.create({
@@ -20,13 +34,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
         expiresIn: process.env.JWT_EXPIRES_IN
     })
 
-    res.status(201).json({
-        status: 'success',
-        token,
-        data: {
-            user
-        }
-    })
+    sendJwtTokenResponse(user, 201, res)
 })
 
 exports.logIn = catchAsync(async (req, res, next) => {
@@ -42,14 +50,7 @@ exports.logIn = catchAsync(async (req, res, next) => {
         return next(new AppError('Provide valid email address or password', 404))
     }
 
-    const token = jwt.sign({id: user._id}, process.env.JWT_PRIVATE_KEY, {
-        expiresIn: process.env.JWT_EXPIRES_IN
-    })
-
-    res.status(200).json({
-        status: 'success',
-        token
-    })
+    sendJwtTokenResponse(user, 200, res);
 })
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -163,12 +164,22 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
    user.save()
 
-   const token = jwt.sign({id: user._id}, process.env.JWT_PRIVATE_KEY, {
-    expiresIn: process.env.JWT_EXPIRES_IN
-   })
+   sendJwtTokenResponse(user, 200, res);
+})
 
-   res.status(200).json({
-    status: 'success',
-    token
-   })
+exports.updatePassword = catchAsync(async (req, res, next) => {
+    const { currentPassword, password, confirmPassword } = req.body
+
+    const user = await User.findById(req.user._id).select('+password')
+
+    if(!(await user.comparePasswords(currentPassword, user.password))){
+        return next(new AppError(`Password don't match`, 400))
+    }
+
+    user.password = password
+    user.confirmPassword = confirmPassword
+
+    user.save()
+
+    sendJwtTokenResponse(user, 200, res);
 })
