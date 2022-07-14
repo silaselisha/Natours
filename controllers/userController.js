@@ -34,42 +34,42 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     })
 })
 
-exports.getUsers = (req, res) => {
+exports.getUsers = catchAsync(async (req, res, next) => {
+    const users = await User.find()
 
-    res.status(500).json({
-        status: 'error',
-        message: 'server error'
+    res.status(200).json({
+        status: 'success',
+        results: users.length,
+        data: {
+            users
+        }
     })
-}
+})
 
-exports.getUser = (req, res) => {
+exports.getUser = catchAsync(async (req, res, next) => {
+    const user = await User.findById(req.params.id)
 
-    res.status(500).json({
-        status: 'error',
-        message: 'server error'
+    if(!user) {
+        return next(new AppError(`User not found`, 404))
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            user
+        }
     })
-}
+})
 
-exports.createUser = (req, res) => {
-  
-    res.status(500).json({
-        status: 'error',
-        message: 'server error'
+
+exports.deleteMe = catchAsync(async (req, res, next) => {
+    await User.findByIdAndUpdate(req.user._id, {active: false}, {
+        new: true,
+        runValidators: true
     })
-}
-
-exports.updateUser = (req, res) => {
-
-    res.status(500).json({
-        status: 'error',
-        message: 'server error'
-    })
-}
-
-exports.deleteUser = (req, res) => {
     
-    res.status(500).json({
-        status: 'error',
-        message: 'server error'
+    res.status(204).json({
+        status: 'success',
+        data: null
     })
-}
+})

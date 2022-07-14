@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetTokenExpires: Date,
+  active: {
+    type: Boolean,
+    default: true
+  },
   createdAt: {
     type: Date,
     default: Date.now()
@@ -64,6 +68,10 @@ userSchema.pre('save', function(next) {
   next()
 })
 
+userSchema.pre(/^find/, function(next) {
+  this.find({active: {$ne: false}})
+  next()
+})
 
 userSchema.methods.comparePasswords = async function(candidatePassword, userPassword) {
   return await bcrypt.compare(candidatePassword, userPassword)
