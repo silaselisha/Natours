@@ -9,6 +9,8 @@ const hpp = require('hpp')
 
 const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
+const reviewRouter = require('./routes/reviewRoute')
+
 const AppError = require('./utils/appError')
 const globalErrorHandler = require('./controllers/error/errorHandler')
 
@@ -37,6 +39,7 @@ const limiter = rateLimit({
 app.use('/api', limiter)
 app.use('/api/v1/tours', tourRouter)
 app.use('/api/v1/users', userRouter)
+app.use('/api/v1/reviews', reviewRouter)
 
 app.all('*', (req, res, next) => {
     return next(new AppError('Routes not implemented in the server', 404))

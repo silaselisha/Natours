@@ -90,6 +90,12 @@ const tourSchema = new mongoose.Schema({
     toObject: {virtuals: true}
 })
 
+tourSchema.virtual('reviews', {
+   ref: 'Review',
+   localField: '_id',
+   foreignField: 'tour'
+})
+
 tourSchema.pre(/^find/, function(next) {
     this.populate({
         path: 'guides',
