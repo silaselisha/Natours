@@ -13,11 +13,7 @@ router.route('/')
     .post(protect, restrictTo('admin', 'lead-guide'), createTour)
 
 router.route('/:id')
-    .get(
-      protect,
-      restrictTo('user', 'admin', 'lead-guide', 'tour-guide'),
-      getTour
-    )
+    .get(getTour)
     .patch(protect, restrictTo('admin', 'lead-guide'), updateTour)
     .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour)
 

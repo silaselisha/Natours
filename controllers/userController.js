@@ -36,6 +36,12 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     })
 })
 
+exports.getLoggedInUserId = (req, res, next) => {
+    req.params.id = req.user._id
+    next()
+}
+
+exports.getMe = getOne(User)
 exports.getUsers = getAll(User)
 exports.getUser = getOne(User)
 
