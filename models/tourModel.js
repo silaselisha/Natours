@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const User = require('./userModel')
 
 const tourSchema = new mongoose.Schema({
     name: {
@@ -74,7 +73,12 @@ const tourSchema = new mongoose.Schema({
             day: Number
         }
     ],
-    guides: Array,
+    guides: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ],
     images: [String],
     startDates: [Date],
     createdAt: {
@@ -86,12 +90,12 @@ const tourSchema = new mongoose.Schema({
     toObject: {virtuals: true}
 })
 
-tourSchema.pre('save', async function(next) {
-    const guidesPromises = this.guides.map(async (id) => {
-        return await User.findById(id)
+tourSchema.pre(/^find/, function(next) {
+    this.populate({
+        path: 'guides',
+        select: '-__v -passwordChangedAt'
     })
 
-    this.guides = await Promise.all(guidesPromises)
     next()
 })
 
