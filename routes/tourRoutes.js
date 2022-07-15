@@ -2,6 +2,7 @@ const express = require('express')
 
 const { getTours, getTour, createTour, updateTour, deleteTour } = require('../controllers/tourController')
 const { protect, restrictTo } = require('../controllers/auth/authController')
+const { createReview } = require('../controllers/reviewController')
 const router = express.Router()
 
 router.route('/')
@@ -16,6 +17,9 @@ router
     getTour
   )
   .put(protect, restrictTo('admin', 'lead-guide'), updateTour)
-  .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour);
+  .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour)
+
+router.route('/:tourId/reviews')
+    .post(protect, restrictTo('user'), createReview)
 
 module.exports = router
