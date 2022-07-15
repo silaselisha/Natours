@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: {
-        values: ['tour-guide', 'user', 'lead-guide', 'admin'],
+        values: ['guide', 'user', 'lead-guide', 'admin'],
         message: '{VALUE} is not a supported role'
     },
     default: 'user'
@@ -41,6 +41,7 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetTokenExpires: Date,
+  photo: String,
   active: {
     type: Boolean,
     default: true
