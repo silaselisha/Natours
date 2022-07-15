@@ -1,6 +1,8 @@
 const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/appError')
+const { getOne, getAll } = require('../controllers/factoryHandler')
 const User = require('../models/userModel')
+
 
 const filteredData = (body, ...fields) => {
     const data = {}
@@ -34,32 +36,8 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     })
 })
 
-exports.getUsers = catchAsync(async (req, res, next) => {
-    const users = await User.find()
-
-    res.status(200).json({
-        status: 'success',
-        results: users.length,
-        data: {
-            users
-        }
-    })
-})
-
-exports.getUser = catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.params.id)
-
-    if(!user) {
-        return next(new AppError(`User not found`, 404))
-    }
-
-    res.status(200).json({
-        status: 'success',
-        data: {
-            user
-        }
-    })
-})
+exports.getUsers = getAll(User)
+exports.getUser = getOne(User)
 
 
 exports.deleteMe = catchAsync(async (req, res, next) => {

@@ -27,6 +27,8 @@ mongoose
   })
   .then(() => {
     console.log(colors.green.inverse('Successfully connected to database...'));
+  }).catch(err => {
+    console.log(colors.red.inverse(err.message))
   })
  
 

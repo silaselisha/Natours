@@ -18,7 +18,7 @@ router.route('/:id')
       restrictTo('user', 'admin', 'lead-guide', 'tour-guide'),
       getTour
     )
-    .put(protect, restrictTo('admin', 'lead-guide'), updateTour)
+    .patch(protect, restrictTo('admin', 'lead-guide'), updateTour)
     .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour)
 
 
