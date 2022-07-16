@@ -91,10 +91,11 @@ const tourSchema = new mongoose.Schema({
     toObject: {virtuals: true}
 })
 
+
 tourSchema.virtual('reviews', {
-   ref: 'Review',
-   localField: '_id',
-   foreignField: 'tour'
+    ref: 'Review',
+    localField: '_id',
+    foreignField: 'tour'
 })
 
 tourSchema.pre(/^find/, function(next) {
@@ -102,10 +103,11 @@ tourSchema.pre(/^find/, function(next) {
         path: 'guides',
         select: '-__v -passwordChangedAt'
     })
-
+    
     next()
 })
 
+tourSchema.index({startLocation: "2dsphere"})
 tourSchema.index({price: 1, ratingsAverage: -1})
 
 const Tour = mongoose.model('Tour', tourSchema)
