@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const slug = require('slugify')
 
 const tourSchema = new mongoose.Schema({
     name: {
@@ -80,6 +81,7 @@ const tourSchema = new mongoose.Schema({
             ref: 'User'
         }
     ],
+    slug: String,
     images: [String],
     startDates: [Date],
     createdAt: {
@@ -109,6 +111,11 @@ tourSchema.pre(/^find/, function(next) {
 
 tourSchema.index({startLocation: "2dsphere"})
 tourSchema.index({price: 1, ratingsAverage: -1})
+
+tourSchema.pre('save', function(next) {
+    this.slug = slug(this.name, {lower: true})
+    next()
+})
 
 const Tour = mongoose.model('Tour', tourSchema)
 module.exports = Tour
