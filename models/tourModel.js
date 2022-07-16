@@ -44,7 +44,8 @@ const tourSchema = new mongoose.Schema({
         type: Number,
         min: 1,
         max: 5,
-        default: 4.5
+        default: 4.5,
+        set: val => Math.round(val * 10) / 10
     },
     ratingsQuantity: {
         type: Number,
@@ -104,6 +105,8 @@ tourSchema.pre(/^find/, function(next) {
 
     next()
 })
+
+tourSchema.index({price: 1, ratingsAverage: -1})
 
 const Tour = mongoose.model('Tour', tourSchema)
 module.exports = Tour
