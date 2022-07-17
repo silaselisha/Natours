@@ -102,28 +102,31 @@ exports.protect = catchAsync(async (req, res, next) => {
     next()
 })
 
-exports.isLoggedin = catchAsync(async (req, res, next) => {
+exports.isLoggedin = async (req, res, next) => {
 
     if(req.cookies.token) {
-        const decodedToken = await jwt.verify(req.cookies.token, process.env.JWT_PRIVATE_KEY)
-        
-        const user = await User.findById(decodedToken.id).select('+password')
-        
-        if (!user) {
-            return next()
-             
-        }
+        try {
+            const decodedToken = await jwt.verify(req.cookies.token, process.env.JWT_PRIVATE_KEY)
             
-        if (user.checkChangedPasswords(decodedToken.iat)) {
+            const user = await User.findById(decodedToken.id).select('+password')
+            
+            if (!user) {
+                return next()
+                 
+            }
+                
+            if (user.checkChangedPasswords(decodedToken.iat)) {
+                return next()
+            }
+        
+            res.locals.user = user
+            return next()
+        } catch (error) {
             return next()
         }
-    
-        res.locals.user = user
-        return next()
     }
-    
     next()
-})
+}
 
 exports.restrictTo = (...roles) => {
     return catchAsync(async (req, res, next) => {
@@ -215,3 +218,13 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
     sendJwtTokenResponse(user, 200, res);
 })
+
+exports.logoutUser = (req, res, next) => {
+    res.cookie('token', 'loggedout', {
+        expires: new Date(Date.now() + 10 * 1000)
+    })
+    
+    res.status(200).json({
+        status: 'success'
+    })
+}
