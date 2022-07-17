@@ -13,11 +13,12 @@ exports.getOverview = catchAsync(async (req, res, next) => {
 exports.getTour = catchAsync(async (req, res, next) => {
     const slug = req.params.slug
     const tour = await Tour.findOne({slug: slug}).populate({
-      path: 'reviews'
+      path: 'reviews',
+      fields: 'review rating user'
     })
 
     res.status(200).render('tour', {
-      title: 'tour',
-      tour 
+      title: `${tour.name} Tour`,
+      tour
     })
 })

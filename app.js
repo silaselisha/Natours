@@ -21,12 +21,11 @@ const app = express()
 app.set('view engine', 'pug')
 app.set('views', path.join(__dirname, 'views'))
 app.use(express.static(path.join(__dirname, 'public')))
-
-app.use(helmet())
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
+app.use(cors());
 app.use(express.json({limit: '10kb'}))
 app.use(mongoSanitize())
 app.use(xss())
-app.use(cors())
 app.use(hpp({
     whitelist: ['price', 'duration', 'ratingsAverage', 'ratingsQuantity', 'maxGroupSize', 'difficulty']
 }))
