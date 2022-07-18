@@ -38,14 +38,14 @@ exports.getLoginForm = catchAsync(async (req, res, next) => {
 })
 
 exports.getMyAccount = catchAsync(async (req, res, next) => {
- 
+  console.log(req.user)
   res.status(200).render('account', {
     title: 'Your account'
   })
 })
 
 exports.updateMyAccount = catchAsync(async (req, res) => {
-
+  console.log(req.user)
   const user = await User.findByIdAndUpdate(req.user._id, {
     name: req.body.name,
     email: req.body.email

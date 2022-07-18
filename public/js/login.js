@@ -1,6 +1,12 @@
 const email = document.querySelector('#email')
+const userName = document.querySelector('#name')
 const password = document.querySelector('#password')
 const logoutBtn = document.querySelector('.nav__el--logout')
+const userDataForm = document.querySelector('.form-user-data');
+const userPasswordForm = document.querySelector('.form-user-settings');
+const passwordCurrent = document.querySelector('#password-current');
+const passwordConfirm = document.querySelector('#password-confirm');
+const button = document.querySelector('.btn--save')
 
 const hideAlert = () => {
     const component = document.querySelector('.alert')
@@ -53,7 +59,33 @@ const logout = async () => {
         }
         
     } catch (err) {
-        showAlert('Error', 'Logout failed, please try again later!')
+        console.log(err)
+        showAlert('error', 'Logout failed, please try again later!')
+    }
+}
+
+const updateSettings = async (data, type) => {
+    try {
+        const URL =
+          type === 'password'
+            ? 'http://localhost:3000/api/v1/users/update-password'
+            : 'http://localhost:3000/api/v1/users/update-me';
+
+        const response = await axios({
+            method: 'PATCH',
+            url: URL,
+            data: data
+        })
+        console.log(response)
+
+        if(response.data.status === 'success') {
+            showAlert('success', `User ${type.toUpperCase()} Successfully updated.`)
+            window.location.reload()
+        }
+        
+    } catch (err) {
+        console.log(err.response)
+        showAlert('error', 'Personal data unsuccessfully saved.')
     }
 }
 
@@ -66,4 +98,31 @@ if (document.querySelector('.form--login'))
 if(logoutBtn)
     logoutBtn.addEventListener('click', (e) => {
         logout()
+    })
+
+if(userDataForm)
+    userDataForm.addEventListener('submit', (e) => {
+        const emailValue = email.value;
+        const nameValue = userName.value;
+        const data = {name: nameValue, email: emailValue, }
+        e.preventDefault()
+        updateSettings(data, 'text')
+    })
+
+if(userPasswordForm)
+    userPasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const currentPassword = passwordCurrent.value
+        const passwordValue = password.value
+        const confirmPassword = passwordConfirm.value
+
+        const data = {
+            currentPassword,
+            password: passwordValue,
+            confirmPassword
+        }
+
+        button.textContent = 'Upadting...'
+        await updateSettings(data, 'password')
+        button.textContent = 'Save password';
     })
