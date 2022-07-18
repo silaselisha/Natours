@@ -26,24 +26,38 @@ const handleJsonWebTokenError = (err) => {
   return new AppError('Invalid token', 500)
 }
 
-const sendErrorToDeveloper = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    stack: err.stack,
-    err,
+const sendErrorToDeveloper = (err, req, res) => {
+  if(req.originalUrl.startsWith('/api')) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+      stack: err.stack,
+      err,
+    })
+  }
+
+  return res.status(err.statusCode).render('error', {
+    title: 'Not found',
+    message: err.message
   })
 }
 
-const sendErrorToClient = (err, res) => {
+const sendErrorToClient = (err, req, res) => {
+  if(!req.originalUrl.startsWith('/api')) {
+    return res.status(err.statusCode).render('error', {
+      title: 'Not found',
+      message: err.message
+    })
+  }
+
   if(err.isOperational) {
-    res.status(err.statusCode).json({
+    return res.status(err.statusCode).json({
       status: err.status,
       message: err.message
     })
   }else {
     console.log(colors.red.inverse(err.message))
-    res.status(500).json({
+    return res.status(500).json({
       status: 'error',
       message: 'something went so wrong!'
     })
@@ -56,7 +70,7 @@ const globalErrorHandler = (err, req, res, next) => {
     err.status = err.status || 'error'
 
     if(process.env.NODE_ENV === 'development') {
-        sendErrorToDeveloper(err, res)
+        sendErrorToDeveloper(err, req, res)
     }else if(process.env.NODE_ENV === 'production') {
     
         if (err.name === 'CastError') 
@@ -71,7 +85,7 @@ const globalErrorHandler = (err, req, res, next) => {
         if (err.name === 'JsonWebTokenError') 
           err = handleJsonWebTokenError(err)
 
-        sendErrorToClient(err, res);
+        sendErrorToClient(err, req, res);
     }
 }
 
