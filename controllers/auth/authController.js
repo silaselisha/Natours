@@ -61,16 +61,14 @@ exports.logIn = catchAsync(async (req, res, next) => {
 })
 
 exports.protect = catchAsync(async (req, res, next) => {
-  
+    
     let token
-    if(!req.headers.authorization) {
-        return next(new AppError('Unauthorized to access this resource, please signup or login', 401))
-    }
 
     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1]
     }else if(req.cookies.token) {
         token = req.cookies.token
+
     }
 
     if(!token) {
@@ -98,6 +96,7 @@ exports.protect = catchAsync(async (req, res, next) => {
       );
     }
 
+    res.locals.user = user
     req.user = user
     next()
 })

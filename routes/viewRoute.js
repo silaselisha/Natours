@@ -1,15 +1,16 @@
 const express = require('express')
-const { getOverview, getTour, getLoginForm } = require('../controllers/viewController')
-const { isLoggedin, logoutUser } = require('../controllers/auth/authController')
+const { getOverview, getTour, getLoginForm, getMyAccount } = require('../controllers/viewController')
+const { isLoggedin, logoutUser, protect } = require('../controllers/auth/authController')
 
 const router = express.Router()
 
-router.use(isLoggedin)
+router.get('/my-account', protect, getMyAccount)
 
-router.get('/', getOverview);
-router.get('/tour/:slug', getTour);
-router.get('/login', getLoginForm)
-router.get('/logout', logoutUser)
+
+router.get('/', isLoggedin, getOverview);
+router.get('/tour/:slug', isLoggedin, getTour);
+router.get('/login', isLoggedin, getLoginForm)
+router.get('/logout', isLoggedin, logoutUser)
 
 
 module.exports = router

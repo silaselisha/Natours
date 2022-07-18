@@ -49,7 +49,7 @@ const logout = async () => {
 
         if(response.data.status === 'success') {
             showAlert('success', 'User successfully logged out.')
-            location.reload()
+            window.location.reload()
         }
         
     } catch (err) {
