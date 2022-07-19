@@ -23,9 +23,9 @@ exports.tourUpload = upload.fields([
 ])
 
 exports.resizeImages = catchAsync(async (req, res, next) => {
-  console.log(req.files)
-  if(!req.files.imageCover || !req.files.images)
+  if(!req.files.imageCover || !req.files.images) {
     return next()
+  }  
 
   const fileName = `tour-${req.user._id}-${Date.now()}-cover.jpg`
 
@@ -37,22 +37,20 @@ exports.resizeImages = catchAsync(async (req, res, next) => {
   
           req.body.imageCover = fileName
 
-  // process images 2
-
   req.body.images = []
   await Promise.all( req.files.images.map(async (image, i) => {
-      const fileName = `tour-${req.user._id}-${Date.now()}-${i + 1}.jpg`
+      const fileNames = `tour-${req.user._id}-${Date.now()}-${i + 1}.jpg`
 
       await sharp(image.buffer)
         .resize(2000, 1333)
         .toFormat('jpeg')
         .jpeg({quality: 90})
-        .toFile(`public/img/tours/${fileName}`)
+        .toFile(`public/img/tours/${fileNames}`)
       
-      req.body.images.push(fileName)
-      console.log(req.body.images)
-  }))
-
+        req.body.images.push(fileNames)
+      }))
+      
+    console.log(req.body.images)
   next()
 })
 
