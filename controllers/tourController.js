@@ -1,9 +1,60 @@
+const multer = require('multer')
+const sharp = require('sharp')
 const Tour = require('../models/tourModel')
 const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/appError')
 
 const { createOne, updateOne, deleteOne, getOne, getAll } = require('../controllers/factoryHandler')
 
+const memory = multer.memoryStorage()
+
+const fileFilter = (req, file, cb) => {
+  if(file.mimetype.startsWith('image')) {
+    cb(null, true)
+  }else {
+    cb(new AppError('Please upload only images!', 400), false)
+  }
+}
+
+const upload = multer({memory: memory, fileFilter: fileFilter})
+exports.tourUpload = upload.fields([
+  {name: 'imageCover', maxCount: 1},
+  {name: 'images', maxCount: 3}
+])
+
+exports.resizeImages = catchAsync(async (req, res, next) => {
+  console.log(req.files)
+  if(!req.files.imageCover || !req.files.images)
+    return next()
+
+  const fileName = `tour-${req.user._id}-${Date.now()}-cover.jpg`
+
+  await sharp(req.files.imageCover[0].buffer)
+          .resize(2000, 1333)
+          .toFormat('jpeg')
+          .jpeg({quality: 90})
+          .toFile(`public/img/tours/${fileName}`)
+  
+          req.body.imageCover = fileName
+
+  // process images 2
+
+  req.body.images = []
+  await Promise.all( req.files.images.map(async (image, i) => {
+      const fileName = `tour-${req.user._id}-${Date.now()}-${i + 1}.jpg`
+
+      await sharp(image.buffer)
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({quality: 90})
+        .toFile(`public/img/tours/${fileName}`)
+      
+      req.body.images.push(fileName)
+      console.log(req.body.images)
+  }))
+
+  next()
+})
 
 exports.toursWithin = catchAsync(async (req, res, next) => {
     const {distance, latlng, unit} = req.params

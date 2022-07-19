@@ -70,7 +70,6 @@ exports.protect = catchAsync(async (req, res, next) => {
         token = req.cookies.token
 
     }
-    console.log(token)
 
     if(!token) {
         return next(
@@ -108,7 +107,7 @@ exports.isLoggedin = async (req, res, next) => {
             const decodedToken = await jwt.verify(req.cookies.token, process.env.JWT_PRIVATE_KEY)
             
             const user = await User.findById(decodedToken.id).select('+password')
-            console.log(user)
+
             if (!user) {
                 return next()
             }

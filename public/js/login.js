@@ -6,6 +6,7 @@ const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-settings');
 const passwordCurrent = document.querySelector('#password-current');
 const passwordConfirm = document.querySelector('#password-confirm');
+const imageUpload = document.querySelector('#upload')
 const button = document.querySelector('.btn--save')
 
 const hideAlert = () => {
@@ -102,11 +103,14 @@ if(logoutBtn)
 
 if(userDataForm)
     userDataForm.addEventListener('submit', (e) => {
-        const emailValue = email.value;
-        const nameValue = userName.value;
-        const data = {name: nameValue, email: emailValue, }
         e.preventDefault()
-        updateSettings(data, 'text')
+        const formData = new FormData()
+
+        formData.append('name', userName.value)
+        formData.append('email', email.value)
+        formData.append('photo', imageUpload.files[0])
+        console.log(formData)
+        updateSettings(formData, 'text')
     })
 
 if(userPasswordForm)
@@ -124,5 +128,8 @@ if(userPasswordForm)
 
         button.textContent = 'Upadting...'
         await updateSettings(data, 'password')
+        passwordCurrent.value = ''
+        password.value = ''
+        passwordConfirm.value = ''
         button.textContent = 'Save password';
     })

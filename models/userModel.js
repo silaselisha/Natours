@@ -41,7 +41,10 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetTokenExpires: Date,
-  photo: String,
+  photo: {
+    type: String,
+    default: 'default.jpg'
+  },
   active: {
     type: Boolean,
     default: true
@@ -62,8 +65,9 @@ userSchema.pre('save', async function(next) {
 })
 
 userSchema.pre('save', function(next) {
-  if(!this.isModified('password') && this.isNew)
+  if(!this.isModified('password') || this.isNew) {
     return next()
+  }
   
   this.passwordChangedAt = Date.now() + 1000
   next()
