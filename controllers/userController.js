@@ -5,17 +5,6 @@ const AppError = require('../utils/appError')
 const { getOne, getAll } = require('../controllers/factoryHandler')
 const User = require('../models/userModel')
 
-
-// const storage = multer.diskStorage({
-//     destination: (req, file, cb) => {
-//         cb(null, 'public/img/users')
-//     },
-//     filename: (req, file, cb) => {
-//         const ext = file.mimetype.split('/')[1]
-//         const name = `user-${req.user._id}-${Date.now()}.${ext}`
-//         cb(null, name)
-//     }
-// })
 const storage = multer.memoryStorage()
 
 const fileFilter = (req, file, cb) => {

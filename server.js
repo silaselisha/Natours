@@ -33,12 +33,13 @@ mongoose
  
 
 const server = app.listen(PORT, () => {
-  console.log(`Listening http://${localhsot}:${PORT}`);
+  // console.log(`Listening http://${localhsot}:${PORT}`);
 });
 
 process.on('unhandledRejection', () => {
+  console.log(colors.red.inverse('Server shutting down...'))
+
   server.close(() => {
-    console.log(colors.red.inverse('Server shutting down...'))
     process.exit(1);
   });
 });

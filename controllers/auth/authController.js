@@ -42,7 +42,6 @@ exports.signUp = catchAsync(async (req, res, next) => {
 
     user.password = undefined
     const URL = `${req.protocol}://${req.get('host')}/my-account`
-    console.log(URL)
     await new Email(user, URL).sendWelcome()
 
     sendJwtTokenResponse(user, 201, res)

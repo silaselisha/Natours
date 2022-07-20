@@ -49,8 +49,6 @@ exports.resizeImages = catchAsync(async (req, res, next) => {
       
         req.body.images.push(fileNames)
       }))
-      
-    console.log(req.body.images)
   next()
 })
 

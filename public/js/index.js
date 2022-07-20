@@ -35,7 +35,7 @@ const loginHandler = async () => {
 
         const response = await axios({
             method: 'POST',
-            url: `http://localhost:3000/api/v1/users/login/`,
+            url: `/api/v1/users/login/`,
             data: {
                 email: emailValue,
                 password: passwordValue
@@ -58,7 +58,7 @@ const logout = async () => {
     try {
         const response = await axios({
             method: 'GET',
-            url: 'http://localhost:3000/api/v1/users/logout'
+            url: '/api/v1/users/logout'
         })
 
         if(response.data.status === 'success') {
@@ -69,7 +69,6 @@ const logout = async () => {
         }
         
     } catch (err) {
-        console.log(err)
         showAlert('error', 'Logout failed, please try again later!')
     }
 }
@@ -78,15 +77,14 @@ const updateSettings = async (data, type) => {
     try {
         const URL =
           type === 'password'
-            ? 'http://localhost:3000/api/v1/users/update-password'
-            : 'http://localhost:3000/api/v1/users/update-me';
+            ? '/api/v1/users/update-password'
+            : '/api/v1/users/update-me';
 
         const response = await axios({
             method: 'PATCH',
             url: URL,
             data: data
         })
-        console.log(response)
 
         if(response.data.status === 'success') {
             showAlert('success', `User ${type.toUpperCase()} Successfully updated.`)
@@ -100,7 +98,7 @@ const updateSettings = async (data, type) => {
 
 const bookingTour = async (tourId) => {
     try {
-        const session = await axios(`http://localhost:3000/api/v1/bookings/checkout-session/${tourId}`)
+        const session = await axios(`/api/v1/bookings/checkout-session/${tourId}`)
 
         await stripe.redirectToCheckout({ sessionId: session.data.session.id });
     } catch (err) {
@@ -127,7 +125,6 @@ if(userDataForm)
         formData.append('name', userName.value)
         formData.append('email', email.value)
         formData.append('photo', imageUpload.files[0])
-        console.log(formData)
         updateSettings(formData, 'text')
     })
 
@@ -154,7 +151,6 @@ if(userPasswordForm)
 
 if(bookTour) 
     bookTour.addEventListener('click', (e) => {
-        console.log(e.target.dataset)
         const { tourId } = e.target.dataset
         bookingTour(tourId)
     })
