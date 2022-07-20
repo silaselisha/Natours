@@ -2,7 +2,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/appError')
 const Tour = require('../models/tourModel')
-
+const Booking = require('../models/bookingModel')
 
 
 exports.bookingTour = catchAsync(async (req, res, next) => {
@@ -11,15 +11,15 @@ exports.bookingTour = catchAsync(async (req, res, next) => {
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      success_url: `${req.protocol}://${req.get('host')}/`,
-      cancel_url: `${req.protocol}://${req.get('host')}/`,
+      success_url: `${req.protocol}://${req.get('host')}/?tour=${tour._id}&user=${req.user._id}&price=${tour.price}`,
+      cancel_url: `${req.protocol}://${req.get('host')}/${tour.slug}`,
       customer_email: req.user.email,
       client_reference_id: req.params.tourId,
       line_items: [
         {
           name: `${tour.name} Tour`,
           description: tour.summary,
-          images: [`http://localhost:3000/img/tours/${tour.imageCover}`],
+          images: [`https://www.natours.dev/img/tours/${tour.imageCover}`],
           amount: tour.price * 100,
           currency: 'usd',
           quantity: 1,
@@ -32,4 +32,22 @@ exports.bookingTour = catchAsync(async (req, res, next) => {
         status: 'success',
         session
     })
+})
+
+
+exports.bookingCheckout = catchAsync(async (req, res, next) => {
+  const { tour, user, price } = req.query
+  console.log(tour, user, price)
+
+  if(!tour & !user & !price) {
+    return next()
+  }
+
+  await Booking.create({
+    tour,
+    user, 
+    price
+  })
+
+  res.redirect(req.originalUrl.split('?')[0])
 })
