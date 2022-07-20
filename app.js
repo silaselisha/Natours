@@ -13,6 +13,7 @@ const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
 const reviewRouter = require('./routes/reviewRoute')
 const viewRouter = require('./routes/viewRoute')
+const bookingRouter = require('./routes/bookingRoute')
 
 const AppError = require('./utils/appError')
 const globalErrorHandler = require('./controllers/error/errorHandler')
@@ -47,6 +48,7 @@ app.use('/api', limiter)
 app.use('/api/v1/tours', tourRouter)
 app.use('/api/v1/users', userRouter)
 app.use('/api/v1/reviews', reviewRouter)
+app.use('/api/v1/bookings', bookingRouter)
 
 app.all('*', (req, res, next) => {
     return next(new AppError('Routes not implemented in the server', 404))

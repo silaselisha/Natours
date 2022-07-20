@@ -8,6 +8,13 @@ const passwordCurrent = document.querySelector('#password-current');
 const passwordConfirm = document.querySelector('#password-confirm');
 const imageUpload = document.querySelector('#upload')
 const button = document.querySelector('.btn--save')
+const bookTour = document.querySelector('#book--tour')
+
+const stripe = Stripe(
+  'pk_test_51L8NxoKrb5pAV7ktZnQDC2mu0RHLzBt6BTcVjQL9tduhRuWLaJav5FPqZeTGSKTmQQNtNKY8lDNCn17U6pFoAPOx00YAOsSgYP'
+)
+
+
 
 const hideAlert = () => {
     const component = document.querySelector('.alert')
@@ -85,8 +92,17 @@ const updateSettings = async (data, type) => {
         }
         
     } catch (err) {
-        console.log(err.response)
         showAlert('error', 'Personal data unsuccessfully saved.')
+    }
+}
+
+const bookingTour = async (tourId) => {
+    try {
+        const session = await axios(`http://localhost:3000/api/v1/bookings/checkout-session/${tourId}`)
+
+        await stripe.redirectToCheckout({ sessionId: session.data.session.id });
+    } catch (err) {
+        showAlert('error', 'Payment for the tour was unsuccessfully.');
     }
 }
 
@@ -132,4 +148,11 @@ if(userPasswordForm)
         password.value = ''
         passwordConfirm.value = ''
         button.textContent = 'Save password';
+    })
+
+if(bookTour) 
+    bookTour.addEventListener('click', (e) => {
+        console.log(e.target.dataset)
+        const { tourId } = e.target.dataset
+        bookingTour(tourId)
     })

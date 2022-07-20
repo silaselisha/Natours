@@ -55,7 +55,6 @@ const filteredData = (body, ...fields) => {
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
-    console.log(req.file)
     if(req.body.password || req.body.confirmPassword) {
         return next(new AppError(`Users cannot use the following route ${req.protocol}://${req.get('host')}${req.originalUrl} to update their password`, 400))
     }

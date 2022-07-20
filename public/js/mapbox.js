@@ -4,8 +4,6 @@ if(locationData) {
   let locations = locationData.dataset.locations
   locations = JSON.parse(locations)
   
-  console.log(locations)
-  
   mapboxgl.accessToken =
     'pk.eyJ1Ijoic2lsYXMtODciLCJhIjoiY2t5YXozeThwMDg4cTJ2cW9kampiMmYyNiJ9.h6RLv6vWwshzP3-N9X9m7A';
   
