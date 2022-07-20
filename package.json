@@ -28,7 +28,6 @@
   "description": "Tours booking application",
   "main": "server.js",
   "devDependencies": {
-    "colors": "^1.4.0",
     "nodemon": "^2.0.19"
   },
   "scripts": {

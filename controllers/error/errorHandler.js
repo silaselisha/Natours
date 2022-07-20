@@ -1,4 +1,3 @@
-const colors = require('colors')
 const AppError = require('../../utils/appError')
 
 const handleCastError = (err) => {
