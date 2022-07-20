@@ -84,7 +84,7 @@ exports.protect = catchAsync(async (req, res, next) => {
         );
     }
 
-    const decodedToken = await jwt.verify(token, process.env.JWT_PRIVATE_KEY)
+    const decodedToken = await promisify(jwt.verify)(token, process.env.JWT_PRIVATE_KEY)
     
     const user = await User.findById(decodedToken.id).select('+password')
 
@@ -108,7 +108,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 exports.isLoggedin = async (req, res, next) => {
     if(req.cookies.token) {
         try {
-            const decodedToken = await jwt.verify(req.cookies.token, process.env.JWT_PRIVATE_KEY)
+            const decodedToken = await promisify(jwt.verify)(req.cookies.token, process.env.JWT_PRIVATE_KEY)
             
             const user = await User.findById(decodedToken.id).select('+password')
 
@@ -119,7 +119,7 @@ exports.isLoggedin = async (req, res, next) => {
             res.locals.user = user
             
             return next()
-        } catch (error) {
+        } catch (err) {
             return next()
         }
     }
@@ -153,10 +153,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
     const url = `${req.protocol}://${req.get('host')}/api/v1/users/reset-password/${resetToken}`
 
-    const message = `Forgot your password? If you had requesetd for a password reset, kindly use this link by submitting your new password  and confirming your new password to reset your password ${url}, the link will expire in 10 minutes. Ignore this email if you didn't request for a password request!`
-
     try{
-        // await sendEmail(options)
         await new Email(user, url).sendResetToken()
 
     } catch (err) {
@@ -213,8 +210,8 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 })
 
 exports.logoutUser = (req, res, next) => {
-    res.cookie('token', 'loggedout', {
-        expires: new Date(Date.now() + 10 * 1000)
+    res.cookie('token', req.cookies.token, {
+        expires: new Date(Date.now() + 5 * 500)
     })
     
     res.status(200).json({

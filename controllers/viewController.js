@@ -1,6 +1,7 @@
 const AppError = require('../utils/appError')
 const Tour = require('../models/tourModel')
 const User = require('../models/userModel')
+const Booking = require('../models/bookingModel')
 
 const catchAsync = require('../utils/catchAsync')
 
@@ -57,5 +58,18 @@ exports.updateMyAccount = catchAsync(async (req, res) => {
   res.status(200).render('account', {
     title: 'Your account',
     user: user
+  })
+})
+
+exports.getMyTourBookings = catchAsync(async (req, res, next) => {
+  const bookings = await Booking.find({user: req.user.id})
+  
+  console.log(bookings)
+  const toursId = bookings.map(booking => booking.tour)
+  const tours = await Tour.find({_id: {$in: toursId}})
+
+  res.status(200).render('overview', {
+    title: 'My bookings',
+    tours: tours
   })
 })

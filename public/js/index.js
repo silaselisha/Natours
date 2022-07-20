@@ -25,7 +25,7 @@ const showAlert = (type, msg) => {
     hideAlert
     const component = `<div class='alert alert--${type}'>${msg}</div>`
     document.querySelector('body').insertAdjacentHTML('afterbegin', component)
-    window.setTimeout(hideAlert, 5000)
+    window.setTimeout(hideAlert, 1500)
 }
 
 const loginHandler = async () => {
@@ -63,7 +63,9 @@ const logout = async () => {
 
         if(response.data.status === 'success') {
             showAlert('success', 'User successfully logged out.')
-            window.location.reload()
+            setTimeout(() => {
+                window.location.assign('/');
+            }, 3000)
         }
         
     } catch (err) {
@@ -88,7 +90,7 @@ const updateSettings = async (data, type) => {
 
         if(response.data.status === 'success') {
             showAlert('success', `User ${type.toUpperCase()} Successfully updated.`)
-            window.location.reload()
+                location.reload()
         }
         
     } catch (err) {
