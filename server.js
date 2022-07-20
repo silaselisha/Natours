@@ -1,5 +1,5 @@
 process.on('uncaughtException', (err) => {
-  console.log(colors.magenta.inverse(err.message))
+  console.log(err.message)
   process.exit(1);
 });
 
@@ -26,18 +26,18 @@ mongoose
     useCreateIndex: true,
   })
   .then(() => {
-    console.log(colors.green.inverse('Successfully connected to database...'));
+    console.log('Successfully connected to database...');
   }).catch(err => {
-    console.log(colors.red.inverse(err.message))
+    console.log(err.message)
   })
  
 
 const server = app.listen(PORT, () => {
-  // console.log(`Listening http://${localhsot}:${PORT}`);
+  console.log(`Listening: ${PORT}`);
 });
 
 process.on('unhandledRejection', () => {
-  console.log(colors.red.inverse('Server shutting down...'))
+  console.log('Server shutting down...')
 
   server.close(() => {
     process.exit(1);

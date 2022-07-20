@@ -56,7 +56,7 @@ const sendErrorToClient = (err, req, res) => {
       message: err.message
     })
   }else {
-    console.log(colors.red.inverse(err.message))
+    console.log(err.message)
     return res.status(500).json({
       status: 'error',
       message: 'something went so wrong!'
