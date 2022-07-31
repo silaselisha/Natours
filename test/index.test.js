@@ -1,7 +1,11 @@
 const  User = require('../models/userModel')
+const puppeteer = require('puppeteer');
 const chai = require('chai')
 
+
+
 const expect = chai.expect
+
 
 describe('User Service Unit Tests', function () {
   describe('Save User functionality', function () {
@@ -35,3 +39,15 @@ describe('User Service Unit Tests', function () {
     it('should throw an error if the number of users with the same profileId is not zero', async function () {});
   });
 });
+
+(async () => {
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+  const page = await browser.newPage();
+  await page.goto('https://memtours.herokuapp.com/');
+  await page.screenshot({ path: 'memetours.png' });
+
+  await browser.close();
+})();
+
