@@ -1,6 +1,7 @@
 const email = document.querySelector('#email')
 const userName = document.querySelector('#name')
 const password = document.querySelector('#password')
+const confirmPassword = document.querySelector('#confirmPassword')
 const logoutBtn = document.querySelector('.nav__el--logout')
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-settings');
@@ -51,6 +52,37 @@ const loginHandler = async () => {
         }
     } catch (err) {
         showAlert('error', err.response.data.message)
+    }
+}
+
+const signUpHandler = async () => {
+    try {
+        const emailValue = email.value
+        const nameValue = userName.value
+        const passwordValue = password.value
+        const confirmPasswordValue = confirmPassword.value
+        
+        const response = await axios({
+            method: 'POST',
+            url: `/api/v1/users/sign-up/`,
+            data: {
+                name: nameValue,
+                email: emailValue,
+                password: passwordValue,
+                confirmPassword: confirmPasswordValue
+            }
+        })
+        
+        const { data } = response
+        if(data.status === 'success') {
+            showAlert('success', 'User account successfully created.')
+            setTimeout(() => {
+                window.location.assign('/')
+            }, 1500)
+        }
+
+    } catch (err) {
+        showAlert('error', err.response.data.message)  
     }
 }
 
@@ -110,6 +142,12 @@ if (document.querySelector('.form--login'))
   document.querySelector('.form').addEventListener('submit', (e) => {
     e.preventDefault();
     loginHandler();
+})
+
+if (document.querySelector('.form--signup'))
+  document.querySelector('.form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    signUpHandler();
 })
 
 if(logoutBtn)
